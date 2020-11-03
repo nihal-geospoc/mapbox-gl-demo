@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  db:
+    image: mdillon/postgis:11-alpine
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=abcd1234
+      - POSTGRES_DB=testdb
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  backend:
+    build:
+      context: ./project/server/
+    container_name: backend
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - ./project/server:/project/server
+    depends_on:
+      - db
+    command: bash -c 'npm install; npm start;'
+    networks:
+      - backend-net
+    environment:
+      - DATABASE_URL=postgres://postgres:abcd1234@docker.for.win.localhost:5432/testdb
+  
+  frontend:
+    build:
+      context: ./project/client/
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - 4200:4200
+    volumes:
+      - ./project/client:/project/client
+    command: bash -c 'npm install; npm start;'
+    networks:
+      - backend-net
+
+networks:
+  backend-net:
+    driver: bridge

@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="modal-body row">
+        <div id="map" class="col-md-8" style="height: 500px; margin-bottom: 10px;"></div>
+        <div class="col-md-4">
+            <div class="input-group" style="margin-bottom: 15px;">
+                <input #point type="text" class="form-control" placeholder="e.g. 102.0, 0.5">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" (click)="addPoint(point)" type="button">Add Point</button>
+                </span>
+            </div>
+            <div class="input-group" style="margin-bottom: 15px;">
+                <input #line type="text" class="form-control" placeholder="e.g. 102.0, 0.0 | 103.0, 1.0">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" (click)="addLine(line)" type="button">Add Line</button>
+                </span>
+            </div>
+            <input type="button" class="btn btn-primary" value="Save Layer" (click)="saveLayer()">
+        </div>
+    </div>
+    <div class="row">
+        <ul *ngFor="let layer of allLayers;">
+            <a style="cursor: pointer;" (click)="loadLayer(layer)">{{layer.sourceId}}</a>
+        </ul>
+    </div>
+</div> 
