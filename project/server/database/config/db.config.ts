@@ -10,6 +10,7 @@ sequelize.authenticate().then(() => {
 const db = {
     'Sequelize': Sequelize,
     'sequelize': sequelize,
-    'Layer': require('../models/layer.model')(sequelize, Sequelize)
+    'Layer': require('../models/layer.model')(sequelize, Sequelize),
+    'PG_Geometry': require('../models/geometry.model')(sequelize, Sequelize)
 }
 export default db;

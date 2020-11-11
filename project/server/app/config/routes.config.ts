@@ -2,6 +2,8 @@
 import * as express from 'express';
 
 import { MapboxController } from '../controllers/mapbox.controller';
+import { TurfController } from '../controllers/turf.controller';
+import { GeometryController } from '../controllers/geometry.controller';
 
 
 export default function routerConfig(app: express.Application) {
@@ -11,6 +13,8 @@ export default function routerConfig(app: express.Application) {
 
   //Define routes
   let mapboxController: MapboxController = new MapboxController(router);
+  let turfController: TurfController = new TurfController(router);
+  let lineController: GeometryController = new GeometryController(router);
 
   // All of our routes will be prefixed with /api
   app.use('/api', router);
