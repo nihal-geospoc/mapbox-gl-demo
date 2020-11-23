@@ -1,8 +1,8 @@
 <div class="container">
     <div class="modal-body row">
-        <div id="map" class="col-md-8" style="height: 500px; margin-bottom: 10px;"></div>
-        <div class="col-md-4">
-            <div class="input-group" style="margin-bottom: 15px;">
+        <div id="map" class="col-md-6" style="height: 500px; margin-bottom: 10px; border: solid 1px;"></div>
+        <div class="col-md-3" style="height: 500px; margin-bottom: 10px; border: solid 1px; border-left: 0px; overflow: auto;">
+            <!-- <div class="input-group" style="margin-bottom: 15px;">
                 <input #point type="text" class="form-control" placeholder="e.g. 102.0, 0.5">
                 <span class="input-group-btn">
                     <button class="btn btn-primary" (click)="addPoint(point)" type="button">Add Point</button>
@@ -14,12 +14,73 @@
                     <button class="btn btn-primary" (click)="addLine(line)" type="button">Add Line</button>
                 </span>
             </div>
-            <input type="button" class="btn btn-primary" value="Save Layer" (click)="saveLayer()">
+            <input type="button" class="btn btn-primary" value="Save Layer" (click)="saveLayer()"> -->
+            <div class="input-group" style="display: inline-block; margin-bottom: 5px;">
+                <form [formGroup]="shapefileForm" novalidate (submit)="submitShapefileForm(shapeform)" #shapeform="ngForm">
+                    <div class="form-input" style="margin-bottom: 5px; margin-top: 5px;" name="shapefile">
+                        <label>Shapefile: </label>
+                        <input #shapeFileInput type="file" style="margin-bottom: 5px;" (change)="onFileChange($event)">
+                        <input type="hidden" name="shapefile" formControlName="shapefile" required/>
+                        <!-- <div *ngIf="form.shapefile.errors?.required && shapeform.submitted" class="alert-danger">
+                            Select Shapefile.
+                        </div> -->
+                    </div>
+                    <div class="form-input">
+                        <input class="btn btn-primary" type="submit" value="Import Shapefile"/>
+                    </div>
+                </form>
+            </div>
+            <div style="border: 1px solid;">
+                <div style="padding: 5px; border-bottom: 1px solid;">
+                    <label style="padding-right: 10px;">Add Layer:</label>
+                    <select name="map-style" style="width: auto; display: inline-block;" class="form-control" [(ngModel)]="stylelist" (ngModelChange)="changeMapStyle($event)" name="stylelist">
+                        <option *ngFor="let style of mapStyleList" [ngValue]='style'>
+                            {{style.name}}
+                        </option>
+                    </select>
+                </div>
+                <div style="padding: 5px; height: 350px; overflow: auto;">
+                    <ul style="list-style: none; padding-left: 0px;" dnd-sortable-container [sortableData]="layersList">
+                        <li style="margin-bottom: 1px; padding: 5px; background: antiquewhite;" (onDragSuccess)="reorderLayers(i)"
+                            *ngFor="let layer of layersList; let i = index;" id="{{layer.id}}" dnd-sortable [sortableIndex]="i">
+                            <input [value]="layer.id" style="height: 20px;" [checked]='true' (change)="toggleLayer($event)"
+                                data-toggle="tooltip" data-placement="bottom" title="Show/Hide Layer" type="checkbox">
+                            <span class="layer-name" data-toggle="tooltip" data-placement="bottom" title="Drag to reorder layer">{{layer.name}}</span>
+                            <span class="layer-options">
+                                <i class="glyphicon glyphicon-menu-hamburger" style="margin: 4px 0 0px;" (click)="openStyleOptions(layer)"
+                                    data-toggle="tooltip" data-placement="bottom" title="Style Layer">
+                                </i>
+                            </span>
+                            <span class="layer-options">
+                                <i class="glyphicon glyphicon-zoom-in" style="margin: 4px 0 0px;" (click)="setLayerZoom(layer)"
+                                    data-toggle="tooltip" data-placement="bottom" title="Zoom to layer">
+                                </i>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" style="height: 500px; margin-bottom: 10px; border: solid 1px; border-left: 0px;">
+            <div style="margin-top: 5px;">
+                <label>Layer Styling</label>
+            </div>
+            <div id="layer-style-div" *ngIf="isLayerStyleShown">
+                <label for="colorPicker" style="margin-top: 10px;">Color:</label>
+                <input [(colorPicker)]="color" hidden (colorPickerChange)="setColor()"
+                    [cpToggle]="true" [cpDialogDisplay]="'inline'" [style.background]="color"
+                    [cpDisableInput]="true" [cpOutputFormat]="'hex'" id="colorPicker"/>
+                <label for="opacity" style="margin-top: 10px;">Opacity:</label>
+                <form class="range-field">
+                    <input type="range" min="0" max="100" (change)="setOpacity()" [(ngModel)]="opacity"
+                        [ngModelOptions]="{standalone: true}" id="opacity"/>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="row">
+    <!-- <div class="row">
         <ul *ngFor="let layer of allLayers;">
             <a style="cursor: pointer;" (click)="loadLayer(layer)">{{layer.sourceId}}</a>
         </ul>
-    </div>
+    </div> -->
 </div> 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -25,4 +25,9 @@ export class MapService {
       );
     });
   }
+
+  uploadShapefile(file, count){
+    return this.httpClient.post<any>("/api/shapefile/upload/"+count, file)
+  }
+
 }

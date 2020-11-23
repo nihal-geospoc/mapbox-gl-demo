@@ -1,0 +1,15 @@
+.layer-name {
+    padding-left: 10px;
+    display: inline-block;
+    width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 20px;
+}
+
+.layer-options {
+    padding-left: 10px;
+    height: 20px;
+    display: inline-block;
+}

@@ -58,4 +58,8 @@ export class TurfService {
             }
         });
     }
+
+    getType(feature: any) {
+        return turf.getGeom(feature).type;
+    }
 }
