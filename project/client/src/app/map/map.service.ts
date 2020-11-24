@@ -26,8 +26,8 @@ export class MapService {
     });
   }
 
-  uploadShapefile(file, count){
-    return this.httpClient.post<any>("/api/shapefile/upload/"+count, file)
+  uploadShapefile(file){
+    return this.httpClient.post<any>("/api/shapefile/upload", file)
   }
 
 }

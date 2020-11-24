@@ -17,8 +17,8 @@ export class MapComponent implements OnInit {
   mapData: MapData;
   // allLayers: Array<MapData>;
   shapefileForm: FormGroup;
-  mapStyleList: Array<any>;
-  stylelist: any;
+  basemapList: Array<any>;
+  selectedBasemap: any;
   layersList: Array<any>;
   color: any;
   opacity: number;
@@ -32,21 +32,21 @@ export class MapComponent implements OnInit {
     private formBuilder: FormBuilder,
     private mapService: MapService
   ) {
-    this.mapStyleList = [
-      {
-        name: 'Blank',
-        id: 'blank',
-        url: 'mapbox://styles/nihal29894/cjptp708k5jzv2rpb8rhbd3nl'
-      },
+    this.basemapList = [
       {
         name: 'light-v10',
         id: 'light-v10',
-        url: 'mapbox://styles/mapbox/light-v10'
+        url: 'https://api.mapbox.com/styles/v1/mapbox/light-v10'
       },
       {
-        name: 'outdoors-v11',
-        id: 'outdoors-v11',
-        url: 'mapbox://styles/mapbox/outdoors-v11'
+        name: 'streets-v11',
+        id: 'streets-v11',
+        url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11'
+      },
+      {
+        name: 'satellite-streets-v11',
+        id: 'satellite-streets-v11',
+        url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11'
       },
     ];
     this.layersList = [];
@@ -70,11 +70,9 @@ export class MapComponent implements OnInit {
     mapboxgl.accessToken = 'pk.eyJ1IjoibmloYWwyOTg5NCIsImEiOiJjanBvMGp2ajIwODgyNDJtZ2c1aWs2cXIyIn0.5_dUTRDnTQYUm2O7LOuftA';
     this.map = new mapboxgl.Map({
       container: document.getElementById('map'),
-      style: 'mapbox://styles/mapbox/light-v10',
-      center: [79.094,21.141],
-      zoom: 10
+      zoom: 0.1
     });
-    
+    this.addBasemap();
     // this.map.on('load', () => {
     //   this.addSourceAndAllLayers();
     // });
@@ -107,7 +105,7 @@ export class MapComponent implements OnInit {
 
   submitShapefileForm(form: NgForm) {
     if(this.shapefileForm.valid){
-      this.mapService.uploadShapefile(this.getFormData(), this.layersList.length).subscribe(data =>
+      this.mapService.uploadShapefile(this.getFormData()).subscribe(data =>
         {
           data.forEach(feature => {
             this.map.addSource(feature.sourceId, feature.source);
@@ -259,20 +257,33 @@ export class MapComponent implements OnInit {
   //   this.addSourceAndAllLayers();
   // }
 
-  changeMapStyle(style){
-    console.log(style);
-    // if (this.layersList.filter(layer => layer.id === style.id).length == 0) {
-    //   this.layersList.unshift({ name: style.name, id: style.id, type: 'raster', sourceId: style.id});
-    //   this.map.addLayer({
-    //     id: style.id,
-    //     type: 'raster',
-    //     source: {
-    //       type: 'raster',
-    //       tiles: [style.url],
-    //       tileSize: 256,
-    //     }
-    //   });
-    // }
+  changeBasemap(basemap){
+    this.basemapList.forEach((bmap)=>{
+      if (basemap.id === bmap.id) {
+        this.map.setLayoutProperty(bmap.id, 'visibility', 'visible');
+      } else {
+        this.map.setLayoutProperty(bmap.id, 'visibility', 'none');
+      }
+    });
+  }
+
+  addBasemap() {
+    let visibility = 'visible';
+    this.basemapList.forEach( (basemap)=> {
+      let url = basemap.url + '/tiles/256/{z}/{x}/{y}?access_token=' + mapboxgl.accessToken;
+      this.map.addLayer({
+        id: basemap.id,
+        type: 'raster',
+        source: {
+          type: 'raster',
+          tiles: [url],
+          tileSize: 256,
+        }
+      });
+      this.map.setLayoutProperty(basemap.id, 'visibility', visibility);
+      visibility = 'none';
+    });
+    this.selectedBasemap = this.basemapList[0];
   }
 
   toggleLayer(event){
@@ -311,17 +322,31 @@ export class MapComponent implements OnInit {
   }
 
   setLayerZoom(layer){
-    console.log(layer);
     let source = this.map.getSource(layer.sourceId);
-    // let coordinates = source._data.features[0].geometry.coordinates;
-    // console.log(coordinates[0]);
-    // let bounds = coordinates.reduce(function (bounds, coord) {
-    //     return bounds.extend(coord);
-    // }, new mapboxgl.LngLatBounds(coordinates[0][0], coordinates[0][0]));
+    let bounds = new mapboxgl.LngLatBounds();
+    let features = source._data.features;
+    features.forEach(function(feature) {
+      if(feature.geometry.type == 'Point'){
+        bounds.extend(feature.geometry.coordinates);
+      }else{
+        bounds.extend(feature.geometry.bbox);
+      }
+    });
+    this.map.fitBounds(bounds, { padding: 20 });
+  }
 
-    // this.map.fitBounds(bounds, {
-    //     padding: 20
-    // });
+  deleteLayer(layer){
+    if(this.selectedLayer && this.selectedLayer.id == layer.id) {
+      document.getElementById(this.selectedLayer.id).style.outline = '';
+      this.isLayerStyleShown = false;
+      this.selectedLayer = undefined;
+    }
+    let index = this.layersList.findIndex( l => l.id === layer.id);
+    if (index > -1) {
+      this.map.removeLayer(layer.id);
+      this.map.removeSource(layer.sourceId);
+      this.layersList.splice(index, 1);
+    }
   }
 
 }

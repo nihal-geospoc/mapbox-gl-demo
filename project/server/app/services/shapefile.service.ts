@@ -4,6 +4,7 @@ import { DefaultLayer } from '../utils/default-layers';
 import fs from 'fs';
 import { feature } from '@turf/turf';
 const shp =  require('shpjs');
+const uniqueString = require('unique-string');
 var that: any;
 
 export class ShapefileService {
@@ -15,7 +16,7 @@ export class ShapefileService {
         that = this;
      }
 
-    getGeojsonFromShapefile(file: any, count?: number) {
+    getGeojsonFromShapefile(file: any) {
         return new Promise((resolve, reject) => {
             fs.readFile(__dirname + file , function (err,data) {
                 if (err) {
@@ -24,19 +25,18 @@ export class ShapefileService {
                 }
                 shp(data).then((result: any) => {
                     let mapData = [];
-                    let index = (count || 0) + 1;
                     if(result instanceof Array){
                         result.forEach((feature) => {
+                            let sourceId = uniqueString();
                             let filename = feature.fileName.split('/');
                             feature.fileName = filename[filename.length-1];  
                             let type = that.turfService.getType(feature.features[0]);
-                            let layer = that.defaultLayer.get(type, ''+index);
-                            mapData.push(that.getMapObject(''+index, feature, layer));
-                            index++;
+                            let layer = that.defaultLayer.get(type, sourceId);
+                            mapData.push(that.getMapObject(sourceId, feature, layer));
                         });
                     }else{
                         let type = that.turfService.getType(result.features[0]);
-                        let sourceId = '' + index; 
+                        let sourceId = uniqueString(); 
                         let layer = that.defaultLayer.get(type, sourceId);
                         mapData.push(that.getMapObject(sourceId, result, layer));
                     }

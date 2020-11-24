@@ -19,7 +19,8 @@
     "multer": "^1.4.2",
     "pg": "^8.4.1",
     "sequelize": "^6.3.5",
-    "shpjs": "^3.6.2"
+    "shpjs": "^3.6.2",
+    "unique-string": "^2.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.8",

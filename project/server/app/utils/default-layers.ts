@@ -16,12 +16,13 @@ export class DefaultLayer {
 
     pointLayer(sourceId: any) {
         return {
-            'id': 'points-layer-' + sourceId,
+            'id': 'point-layer-' + sourceId,
             'type': 'circle',
             'source': sourceId,
             'paint': {
                 'circle-radius': 6,
-                'circle-color': 'red'
+                'circle-color': '#bc0a0a',
+                'circle-opacity': 1
             },
             'filter': ['==', '$type', 'Point']
         };
@@ -43,12 +44,13 @@ export class DefaultLayer {
 
     lineLayer(sourceId: any) {
         return {
-            'id': 'lines-layer-' + sourceId,
+            'id': 'line-layer-' + sourceId,
             'type': 'line',
             'source': sourceId,
             'paint': {
-                'line-color': '#888',
-                'line-width': 2
+                'line-color': '#e7d829',
+                'line-width': 2,
+                'line-opacity': 1
             },
             'filter': ['==', '$type', 'LineString']
         };
