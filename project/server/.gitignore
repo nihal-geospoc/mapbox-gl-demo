@@ -45,9 +45,6 @@ yarn-error.log
 testem.log
 /typings
 
-#shapefiles
-/shapefiles
-
 # System Files
 .DS_Store
 Thumbs.db
